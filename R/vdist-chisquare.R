@@ -31,19 +31,19 @@
 #'
 #' @export
 #'
-vdist_chisquare_plot <- function(df = 3, normal = FALSE, xaxis_range = 25, print_plot = TRUE) {
+vdist_chisquare_plot <- function(df = 3, normal = FALSE, xaxis_range = 25, print_plot = TRUE, mean_sd = TRUE) {
 
   check_numeric(df, "df")
   check_logical(normal)
 
   data <- cplot_data_prep(df, xaxis_range)
-  plot <- cplot_plot_build(data, df, xaxis_range, normal)
+  plot <- cplot_plot_build(data, df, xaxis_range, normal, mean_sd)
 
-	if (print_plot) {
-	  print(plot)
-	} else {
-	  return(plot)
-	}
+  if (print_plot) {
+    print(plot)
+  } else {
+    return(plot)
+  }
 
 }
 
@@ -60,31 +60,38 @@ vdist_chisquare_perc <- function(probs = 0.95, df = 3, type = c("lower", "upper"
   data   <- cperc_data_prep(probs, df, method)
   plot   <- cperc_plot_build(data, method, probs, df)
 
-	if (print_plot) {
-	  print(plot)
-	} else {
-	  return(plot)
-	}
+  if (print_plot) {
+    print(plot)
+  } else {
+    return(plot)
+  }
 
 }
 
 #' @rdname vdist_chisquare_plot
 #' @export
 #'
-vdist_chisquare_prob <- function(perc = 13, df = 11, type = c("lower", "upper"), print_plot = TRUE) {
+vdist_chisquare_prob <- function(
+    perc = 13,
+    df = 11,
+    type = c("lower", "upper"),
+    print_plot = TRUE,
+    mean_sd = TRUE,
+    print_prob = FALSE
+) {
 
   check_numeric(df, "df")
   check_numeric(perc, "perc")
 
   method <- match.arg(type)
   data   <- cprob_data_prep(perc, df, method)
-  plot   <- cprob_plot_build(data, method, perc, df)
+  plot   <- cprob_plot_build(data, method, perc, df, mean_sd, print_prob)
 
-	if (print_plot) {
-	  print(plot)
-	} else {
-	  return(plot)
-	}
+  if (print_plot) {
+    print(plot)
+  } else {
+    return(plot)
+  }
 
 }
 

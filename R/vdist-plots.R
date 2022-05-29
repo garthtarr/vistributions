@@ -15,7 +15,7 @@ bplot_plot_build <- function(data, n, p) {
     geom_col(aes(x = n, y = df), fill = "blue") +
     ylab("Probability") +
     xlab("No. of success") +
-    ggtitle(label    = paste("Binomial Distribution: n =", n, ", p =", p),
+    ggtitle(label    = paste("Binomial distribution: n =", n, ", p =", p),
             subtitle = paste("Mean =", data$bm, ", Std. Dev. =", data$bsd)) +
     theme(plot.title    = element_text(hjust = 0.5),
           plot.subtitle = element_text(hjust = 0.5)) +
@@ -40,22 +40,22 @@ bprob_plot_build <- function(data, method, n, p, s) {
   if (method == "lower") {
     plot <-
       plot +
-      ggtitle(label    = paste("Binomial Distribution: n =", n, ", p =", p),
+      ggtitle(label    = paste("Binomial distribution: n =", n, ", p =", p),
               subtitle = paste("P(X) <=", s, "=", round(data$k, 3)))
   } else if (method == "upper") {
     plot <-
       plot +
-      ggtitle(label    = paste("Binomial Distribution: n =", n, ", p =", p),
+      ggtitle(label    = paste("Binomial distribution: n =", n, ", p =", p),
               subtitle = paste("P(X) >=", s, "=", round(data$k, 3)))
   } else if (method == "exact") {
     plot <-
       plot +
-      ggtitle(label    = paste("Binomial Distribution: n =", n, ", p =", p),
+      ggtitle(label    = paste("Binomial distribution: n =", n, ", p =", p),
               subtitle = paste("P(X) =", s, "=", round(data$k, 3)))
   } else {
     plot <-
       plot +
-      ggtitle(label    = paste("Binomial Distribution: n =", n, ", p =", p),
+      ggtitle(label    = paste("Binomial distribution: n =", n, ", p =", p),
               subtitle = paste0("P(", s[1], " <= X <= ", s[2], ")", " = ", round(data$k, 3)))
   }
 
@@ -77,34 +77,33 @@ bperc_plot_build <- function(data, method, n, p, tp) {
   if (method == "lower") {
     plot <-
       plot +
-      ggtitle(label    = paste("Binomial Distribution: n =", n, ", p =", p),
+      ggtitle(label    = paste("Binomial distribution: n =", n, ", p =", p),
               subtitle = paste0("P(X <= ", data$k, ") <= ", tp, ", but P(X <= ", (data$k + 1), ") > ", tp)
       )
   } else {
     plot <-
       plot +
-      ggtitle(label    = paste("Binomial Distribution: n =", n, ", p =", p),
+      ggtitle(label    = paste("Binomial distribution: n =", n, ", p =", p),
               subtitle = paste0("P(X >= ", (data$k + 1), ") <= ", tp, ", but P(X >= ", data$k, ") > ", tp)
       )
   }
 
   return(plot)
-  
+
 }
 
-cplot_plot_build <- function(data, df, range, normal) {
+cplot_plot_build <- function(data, df, range, normal, mean_sd) {
 
   pp <-
     ggplot(data$plot_data) +
     geom_line(aes(x, chi),
               color = '#4682B4',
               size  = 2) +
-    ggtitle(label    = "Chi Square Distribution",
+    ggtitle(label    = "Chi Square distribution",
             subtitle = paste("df =", df)) +
     ylab('') +
-    xlab(paste("Mean =", data$chim, " Std Dev. =", data$chisd)) +
-    theme(plot.title    = element_text(hjust = 0.5),
-          plot.subtitle = element_text(hjust = 0.5)) +
+    # theme(plot.title    = element_text(hjust = 0.5),
+    #       plot.subtitle = element_text(hjust = 0.5)) +
     scale_x_continuous(breaks = seq(0, range, 2)) +
     geom_polygon(data    = data$poly_data,
                  mapping = aes(x = y, y = z),
@@ -114,6 +113,10 @@ cplot_plot_build <- function(data, df, range, normal) {
                shape   = 4,
                color   = 'red',
                size    = 3)
+
+  if(mean_sd) {
+    pp <- pp + xlab(paste("Mean =", data$chim, " Std Dev. =", data$chisd))
+  }
 
   if (normal) {
 
@@ -129,22 +132,32 @@ cplot_plot_build <- function(data, df, range, normal) {
 
 }
 
-cperc_plot_build <- function(data, method, probs, df) {
+cperc_plot_build <- function(data, method, probs, df, mean_sd, print_prob) {
 
   plot <-
     ggplot(data$plot_data) +
     geom_line(aes(x = x, y = y),
               color = "blue") +
-    xlab(paste("Mean =", data$chim, " Std Dev. =", data$chisd)) +
-    ylab('') +
-    theme(plot.title    = element_text(hjust = 0.5),
-          plot.subtitle = element_text(hjust = 0.5))
+    ylab('') #+
+    # theme(plot.title    = element_text(hjust = 0.5),
+    #       plot.subtitle = element_text(hjust = 0.5))
+
+  if(mean_sd) {
+    pp <- pp + xlab(paste("Mean =", data$chim, " Std Dev. =", data$chisd))
+  }
+
+  if(print_prob){
+    probs_text = pvalr(probs)
+    } else {
+    probs_text = paste0("= ", probs * 100, "%")
+  }
+
 
   if (method == "lower") {
     plot <-
       plot +
-      ggtitle(label    = paste("Chi Square Distribution: df =", df),
-              subtitle = paste0("P(X < ", data$pp, ") = ", probs * 100, "%")) +
+      ggtitle(label    = paste("Chi Square distribution: df =", df),
+              subtitle = paste0("P(X < ", data$pp, ") ",probs_text)) +
       annotate("text",
                label   = paste0(probs * 100, "%"),
                x       = data$pp - data$chisd,
@@ -161,7 +174,7 @@ cperc_plot_build <- function(data, method, probs, df) {
   } else {
     plot <-
       plot +
-      ggtitle(label    = paste("Chi Square Distribution: df =", df),
+      ggtitle(label    = paste("Chi Square distribution: df =", df),
               subtitle = paste0("P(X > ", data$pp, ") = ", probs * 100, "%")) +
       annotate("text",
                label   = paste0((1 - probs) * 100, "%"),
@@ -204,23 +217,32 @@ cperc_plot_build <- function(data, method, probs, df) {
 
 }
 
-cprob_plot_build <- function(data, method, perc, df) {
+cprob_plot_build <- function(data, method, perc, df, mean_sd, print_prob) {
 
   gplot <-
     ggplot(data$plot_data) +
     geom_line(aes(x = x, y = y),
               color = "blue") +
-    xlab(paste("Mean =", data$chim, " Std Dev. =", data$chisd)) +
-    ylab('') +
-    theme(plot.title    = element_text(hjust = 0.5),
-          plot.subtitle = element_text(hjust = 0.5))
+    ylab('') #+
+    # theme(plot.title    = element_text(hjust = 0.5),
+    #       plot.subtitle = element_text(hjust = 0.5))
+
+  if(mean_sd){
+    gplot <- gplot + xlab(paste("Mean =", data$chim, " Std Dev. =", data$chisd))
+  }
+
+  if(print_prob){
+    probs_text = pvalr(data$pp)
+  } else {
+    probs_text = paste0("= ", data$pp * 100, "%")
+  }
 
 
   if (method == "lower") {
     gplot <-
       gplot +
-      ggtitle(label    = paste("Chi Square Distribution: df =", df),
-              subtitle = paste0("P(X < ", perc, ") = ", data$pp * 100, "%")) +
+      ggtitle(label    = paste("Chi Square distribution: df =", df),
+              subtitle = paste0("P(X < ", perc, ") ",probs_text)) +
       annotate("text",
                label = paste0(data$pp * 100, "%"),
                x     = perc - data$chisd,
@@ -237,8 +259,8 @@ cprob_plot_build <- function(data, method, perc, df) {
   } else {
     gplot <-
       gplot +
-      ggtitle(label    = paste("Chi Square Distribution: df =", df),
-              subtitle = paste0("P(X > ", perc, ") = ", data$pp * 100, "%")) +
+      ggtitle(label    = paste("Chi Square distribution: df =", df),
+              subtitle = paste0("P(X > ", perc, ") ",probs_text)) +
       annotate("text",
                label = paste0((1 - data$pp) * 100, "%"),
                x     = perc - data$chisd,
@@ -301,7 +323,7 @@ fplot_plot_build <- function(data, num_df, den_df, normal) {
                size    = 3) +
     xlab(paste("Mean =", data$fm, " Std Dev. =", data$fsd)) +
     ylab('') +
-    ggtitle(label    = 'f Distribution',
+    ggtitle(label    = 'f distribution',
             subtitle = paste("Num df =", num_df, "  Den df =", den_df)) +
     theme(plot.title    = element_text(hjust = 0.5),
           plot.subtitle = element_text(hjust = 0.5)) +
@@ -335,7 +357,7 @@ fperc_plot_build <- function(data, probs, num_df, den_df, method) {
   if (method == "lower") {
     gplot <-
       gplot +
-      ggtitle(label    = 'f Distribution',
+      ggtitle(label    = 'f distribution',
               subtitle = paste0("P(X < ", data$pp, ") = ", probs * 100, "%")) +
       annotate("text",
                label = paste0(probs * 100, "%"),
@@ -353,7 +375,7 @@ fperc_plot_build <- function(data, probs, num_df, den_df, method) {
   } else {
     gplot <-
       gplot +
-      ggtitle(label    = 'f Distribution',
+      ggtitle(label    = 'f distribution',
               subtitle = paste0("P(X > ", data$pp, ") = ", probs * 100, "%")) +
       annotate("text",
                label = paste0((1 - probs) * 100, "%"),
@@ -419,7 +441,7 @@ fprob_plot_build <- function(data, perc, num_df, den_df, method) {
   if (method == "lower") {
     gplot <-
       gplot +
-      ggtitle(label    = 'f Distribution',
+      ggtitle(label    = 'f distribution',
               subtitle = paste0("P(X < ", perc, ") = ", data$pp * 100, "%")) +
       annotate("text",
                label = paste0(data$pp * 100, "%"),
@@ -437,7 +459,7 @@ fprob_plot_build <- function(data, perc, num_df, den_df, method) {
   } else {
     gplot <-
       gplot +
-      ggtitle(label    = 'f Distribution',
+      ggtitle(label    = 'f distribution',
               subtitle = paste0("P(X > ", perc, ") = ", data$pp * 100, "%")) +
       annotate("text",
                label = paste0(round((1 - data$pp) * 100, 2), "%"),
@@ -502,7 +524,7 @@ nplot_plot_build <- function(data, mean, sd) {
     geom_line(aes(x = x, y = y)) +
     xlab('') +
     ylab('') +
-    ggtitle(label    = "Normal Distribution",
+    ggtitle(label    = "Normal distribution",
             subtitle = paste("Mean:", mean, "     Standard Deviation:", sd)) +
     theme(plot.title    = element_text(hjust = 0.5),
           plot.subtitle = element_text(hjust = 0.5))
@@ -539,7 +561,7 @@ nperc_plot_build <- function(data, probs, mean, sd, method) {
   if (method == "lower") {
     gplot <-
       gplot +
-      ggtitle(label    = "Normal Distribution",
+      ggtitle(label    = "Normal distribution",
               subtitle = paste0("P(X < ", data$pp, ") = ", probs * 100, "%")) +
       annotate("text",
                label = paste0(probs * 100, "%"),
@@ -557,7 +579,7 @@ nperc_plot_build <- function(data, probs, mean, sd, method) {
   } else if (method == "upper") {
     gplot <-
       gplot +
-      ggtitle(label    = "Normal Distribution",
+      ggtitle(label    = "Normal distribution",
               subtitle = paste0("P(X > ", data$pp, ") = ", probs * 100, "%")) +
       annotate("text",
                label = paste0((1 - probs) * 100, "%"),
@@ -574,7 +596,7 @@ nperc_plot_build <- function(data, probs, mean, sd, method) {
   } else {
     gplot <-
       gplot +
-      ggtitle(label    = "Normal Distribution",
+      ggtitle(label    = "Normal distribution",
               subtitle = paste0("P(", data$pp[1], " < X < ", data$pp[2], ") = ", probs * 100, "%")) +
       annotate("text",
                label = paste0(probs * 100, "%"),
@@ -644,7 +666,7 @@ nprob_plot_build <- function(data, perc, mean, sd, method) {
   if (method == "lower") {
     gplot <-
       gplot +
-      ggtitle(label    = "Normal Distribution",
+      ggtitle(label    = "Normal distribution",
               subtitle = paste0("P(X < ", perc, ") = ", data$pp * 100, "%")) +
       annotate("text",
                label = paste0(data$pp * 100, "%"),
@@ -662,7 +684,7 @@ nprob_plot_build <- function(data, perc, mean, sd, method) {
   } else if (method == "upper") {
     gplot <-
       gplot +
-      ggtitle(label    = "Normal Distribution",
+      ggtitle(label    = "Normal distribution",
               subtitle = paste0("P(X > ", perc, ") = ", data$pp * 100, "%")) +
       annotate("text",
                label = paste0((1 - data$pp) * 100, "%"),
@@ -679,7 +701,7 @@ nprob_plot_build <- function(data, perc, mean, sd, method) {
   } else {
     gplot <-
       gplot +
-      ggtitle(label    = "Normal Distribution",
+      ggtitle(label    = "Normal distribution",
               subtitle = paste0("P(", perc[1], " < X < ", perc[2], ") = ", (1 - (data$pp1 + data$pp2)) * 100, "%")) +
       annotate("text",
                label = paste0((1 - (data$pp1 + data$pp2)) * 100, "%"),
@@ -743,7 +765,7 @@ tplot_plot_build <- function(data, df) {
     ggplot(data$plot_data) +
     geom_line(aes(x = x, y = y),
               color = 'blue') +
-    ggtitle(label    = 't Distribution',
+    ggtitle(label    = 't distribution',
             subtitle = paste("df =", df)) +
     xlab('') +
     ylab('') +
@@ -773,7 +795,7 @@ tperc_plot_build <- function(data, probs, df, method) {
   if (method == "lower") {
     gplot <-
       gplot +
-      ggtitle(label    = "t Distribution",
+      ggtitle(label    = "t distribution",
               subtitle = paste0("P(X < ", data$pp, ") = ", probs * 100, "%")) +
       annotate("text",
                label = paste0(probs * 100, "%"),
@@ -791,7 +813,7 @@ tperc_plot_build <- function(data, probs, df, method) {
   } else if (method == "upper") {
     gplot <-
       gplot +
-      ggtitle(label    = "t Distribution",
+      ggtitle(label    = "t distribution",
               subtitle = paste0("P(X > ", data$pp, ") = ", probs * 100, "%")) +
       annotate("text",
                label = paste0((1 - probs) * 100, "%"),
@@ -808,7 +830,7 @@ tperc_plot_build <- function(data, probs, df, method) {
   } else {
     gplot <-
       gplot +
-      ggtitle(label    = "t Distribution",
+      ggtitle(label    = "t distribution",
               subtitle = paste0("P(", data$pp[1], " < X < ", data$pp[2], ") = ", probs * 100, "%")) +
       annotate("text",
                label = paste0(probs * 100, "%"),
@@ -894,7 +916,7 @@ tprob_plot_build <- function(data, perc, df, method) {
 
     gplot <-
       gplot +
-      ggtitle(label    = "t Distribution",
+      ggtitle(label    = "t distribution",
               subtitle = paste0("P(X < ", perc, ") = ", data$pp * 100, "%")) +
       annotate("text",
                label = paste0(data$pp * 100, "%"),
@@ -923,7 +945,7 @@ tprob_plot_build <- function(data, perc, df, method) {
 
     gplot <-
       gplot +
-      ggtitle(label    = "t Distribution",
+      ggtitle(label    = "t distribution",
               subtitle = paste0("P(X > ", perc, ") = ", data$pp * 100, "%")) +
       annotate("text",
                label = paste0((1 - data$pp) * 100, "%"),
@@ -952,7 +974,7 @@ tprob_plot_build <- function(data, perc, df, method) {
 
     gplot <-
       gplot +
-      ggtitle(label    = "t Distribution",
+      ggtitle(label    = "t distribution",
               subtitle = paste0("P(", -perc, " < X < ", perc, ") = ", (1 - (data$pp1 + data$pp2)) * 100, "%")) +
       annotate("text",
                label = paste0((1 - (data$pp1 + data$pp2)) * 100, "%"),
@@ -994,7 +1016,7 @@ tprob_plot_build <- function(data, perc, df, method) {
 
     gplot <-
       gplot +
-      ggtitle(label    = "t Distribution",
+      ggtitle(label    = "t distribution",
               subtitle = paste0("P(|X| > ", perc, ") = ", (data$pp1 + data$pp2) * 100, "%")) +
       annotate("text",
                label = paste0((1 - (data$pp1 + data$pp2)) * 100, "%"),

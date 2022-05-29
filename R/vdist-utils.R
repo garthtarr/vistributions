@@ -1,4 +1,4 @@
-#' @import utils 
+#' @import utils
 #' @import ggplot2
 check_suggests <- function(pkg) {
 
@@ -44,4 +44,25 @@ check_range <- function(val, min = 0, max = 1, var = "p") {
   if ((val < min) | (val > max)) {
     stop(paste(var, "must be between", min, "and", max, "only."), call. = FALSE)
   }
+}
+
+
+pvalr <- function(pvals, sig.limit = .001, digits = 3, two_digit_threshold = 0.1, html = FALSE) {
+
+  roundr <- function(x, digits = 1) {
+    res <- sprintf(paste0('%.', digits, 'f'), x)
+    zzz <- paste0('0.', paste(rep('0', digits), collapse = ''))
+    res[res == paste0('-', zzz)] <- zzz
+    res
+  }
+
+  sapply(pvals, function(x, sig.limit) {
+    if (x < sig.limit)
+      if (html)
+        return(sprintf('&lt; %s', format(sig.limit))) else
+          return(sprintf('< %s', format(sig.limit)))
+    if (x > two_digit_threshold)
+      return(paste0("= ",roundr(x, digits = 2))) else
+        return(paste0("= ",roundr(x, digits = digits)))
+  }, sig.limit = sig.limit)
 }

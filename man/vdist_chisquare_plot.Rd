@@ -10,7 +10,9 @@ vdist_chisquare_plot(
   df = 3,
   normal = FALSE,
   xaxis_range = 25,
-  print_plot = TRUE
+  print_plot = TRUE,
+  mean_sd = TRUE,
+  print_prob = FALSE
 )
 
 vdist_chisquare_perc(
